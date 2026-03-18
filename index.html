@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dulce Ruth · Nueva Venta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  </head>
+  <body class="p-4 md:p-8 lg:p-12">
+    <div class="max-w-3xl mx-auto fade-up">
+      <!--  ENCABEZADO  -->
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-4 print-shadow"
+      >
+        <div
+          class="h-1.5 w-full"
+          style="
+            background: linear-gradient(
+              90deg,
+              #7c5c3a 0%,
+              #c49a6c 50%,
+              #7c5c3a 100%
+            );
+          "
+        ></div>
+
+        <div
+          class="p-6 md:p-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4"
+        >
+          <div>
+            <div class="flex items-center gap-2.5 mb-1">
+              <div
+                class="w-9 h-9 rounded-xl flex items-center justify-center"
+                style="background: linear-gradient(135deg, #7c5c3a, #c49a6c)"
+              >
+                <i data-lucide="cake" class="w-5 h-5 text-white"></i>
+              </div>
+              <span class="text-xl font-bold tracking-tight text-stone-800"
+                >Dulce Ruth</span
+              >
+            </div>
+            <p class="text-xs text-stone-400 ml-11">Insumos de Repostería</p>
+          </div>
+
+          <div class="text-right">
+            <div
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 mb-2"
+            >
+              <i data-lucide="receipt" class="w-3.5 h-3.5 text-amber-700"></i>
+              <span
+                class="mono text-xs font-medium text-amber-800"
+                id="invoiceNum"
+                >VTA-0001</span
+              >
+            </div>
+            <p class="text-xs text-stone-400" id="invoiceDate"></p>
+          </div>
+        </div>
+      </div>
+
+      <!--  CLIENTE  -->
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8 mb-4 print-shadow"
+      >
+        <div class="flex items-center gap-2 mb-5">
+          <i data-lucide="user-round" class="w-4 h-4 text-stone-400"></i>
+          <h2
+            class="text-xs font-semibold uppercase tracking-widest text-stone-400"
+          >
+            Datos del cliente
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Nombre -->
+          <div>
+            <label class="block text-xs font-medium text-stone-500 mb-1.5"
+              >Nombre</label
+            >
+            <input
+              id="clientName"
+              type="text"
+              placeholder="Ej: María García"
+              oninput="checkClientReady()"
+              class="field w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-800 bg-stone-50 placeholder-stone-300 transition"
+            />
+          </div>
+
+          <!-- Tipo de cliente -->
+          <div>
+            <label class="block text-xs font-medium text-stone-500 mb-1.5"
+              >Tipo de cliente</label
+            >
+            <div class="flex gap-2">
+              <button
+                class="chip flex-1 py-2.5 rounded-xl border border-stone-200 text-sm font-medium text-stone-600 active no-print"
+                id="chipMinorista"
+                onclick="setClientType('minorista')"
+              >
+                Minorista
+              </button>
+              <button
+                class="chip flex-1 py-2.5 rounded-xl border border-stone-200 text-sm font-medium text-stone-600 no-print"
+                id="chipMayorista"
+                onclick="setClientType('mayorista')"
+              >
+                Mayorista
+              </button>
+            </div>
+            <input type="hidden" id="clientType" value="minorista" />
+          </div>
+        </div>
+      </div>
+
+      <!--  PRODUCTOS  -->
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8 mb-4 print-shadow"
+      >
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="package" class="w-4 h-4 text-stone-400"></i>
+            <h2
+              class="text-xs font-semibold uppercase tracking-widest text-stone-400"
+            >
+              Productos
+            </h2>
+          </div>
+          <span class="mono text-xs text-stone-300" id="rowCount"
+            >0 ítem(s)</span
+          >
+        </div>
+
+        <div
+          class="hidden md:flex text-xs font-semibold uppercase tracking-wider text-stone-400 pb-3 border-b border-stone-100"
+          style="gap: 0"
+        >
+          <div style="width: 32%">Producto</div>
+          <div style="width: 13%" class="text-center">Precio</div>
+          <div style="width: 13%" class="text-center">Cant.</div>
+          <div style="width: 13%" class="text-center">Stock</div>
+          <div style="width: 15%" class="text-center">Vencimiento</div>
+          <div style="width: 14%" class="text-right pr-8">Subtotal</div>
+        </div>
+
+        <!-- Filas de productos -->
+        <div
+          id="productRows"
+          class="divide-y divide-stone-100 min-h-[60px]"
+        ></div>
+
+        <div
+          id="emptyState"
+          class="flex flex-col items-center justify-center py-10 text-stone-300"
+        >
+          <i
+            data-lucide="shopping-basket"
+            class="w-10 h-10 mb-2 opacity-40"
+          ></i>
+          <p class="text-sm">Sin productos agregados</p>
+        </div>
+
+        <div class="mt-5 no-print">
+          <button
+            onclick="addRow()"
+            id="btnAddRow"
+            disabled
+            class="btn-add flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white opacity-40 cursor-not-allowed"
+            style="background: #7c5c3a"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Agregar producto
+          </button>
+          <p
+            id="clientWarning"
+            class="mt-2 text-xs text-amber-600 flex items-center gap-1.5"
+          >
+            <i data-lucide="triangle-alert" class="w-3.5 h-3.5 shrink-0"></i>
+            Completa el nombre e indica el tipo de cliente para agregar
+            productos.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8 mb-4 print-shadow"
+      >
+        <div class="flex items-center gap-2 mb-5">
+          <i data-lucide="calculator" class="w-4 h-4 text-stone-400"></i>
+          <h2
+            class="text-xs font-semibold uppercase tracking-widest text-stone-400"
+          >
+            Resumen
+          </h2>
+        </div>
+
+        <div class="space-y-2.5 mb-6">
+          <div class="flex justify-between text-sm text-stone-500">
+            <span>Subtotal</span>
+            <span class="mono" id="summarySubtotal">S/ 0.00</span>
+          </div>
+          <div class="flex justify-between text-sm text-stone-400">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="tag" class="w-3.5 h-3.5"></i> IGV (18%)
+            </span>
+            <span class="mono" id="summaryIgv">S/ 0.00</span>
+          </div>
+          <hr class="hr-deco my-1" />
+          <!-- TOTAL -->
+          <div class="flex justify-between items-center pt-1">
+            <span class="text-sm font-semibold text-stone-600"
+              >Total a pagar</span
+            >
+            <div class="text-right">
+              <div
+                class="mono text-3xl font-bold tracking-tight"
+                id="summaryTotal"
+                style="color: #7c5c3a; line-height: 1"
+              >
+                S/ 0.00
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="hr-deco mb-5" />
+
+        <div class="flex flex-col sm:flex-row gap-3 no-print">
+          <button
+            onclick="clearAll()"
+            class="btn-clear flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl border border-stone-200 text-sm font-medium text-stone-500 bg-stone-50"
+          >
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            Limpiar
+          </button>
+          <button
+            onclick="confirmSale()"
+            class="btn-confirm flex items-center justify-center gap-2 flex-1 py-3 rounded-xl text-sm font-semibold text-white"
+            style="background: #3a6b45"
+          >
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            Confirmar venta
+          </button>
+        </div>
+      </div>
+
+      <p class="text-center text-xs text-stone-300 pb-6">
+        Dulce Ruth · Sistema de Ventas · <span id="footerYear"></span>
+      </p>
+    </div>
+
+    <!--  MODAL CONFIRMACIÓN  -->
+    <div
+      id="modalOverlay"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 fade-up text-center"
+      >
+        <div
+          class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
+          style="background: #dcfce7"
+        >
+          <i data-lucide="check-circle-2" class="w-7 h-7 text-green-600"></i>
+        </div>
+        <h3 class="text-lg font-bold text-stone-800 mb-1">
+          ¡Venta registrada!
+        </h3>
+        <p class="text-sm text-stone-400 mb-2" id="modalClient">—</p>
+        <div
+          class="mono text-2xl font-bold mb-6"
+          style="color: #7c5c3a"
+          id="modalTotal"
+        >
+          S/ 0.00
+        </div>
+        <button
+          onclick="closeModal()"
+          class="btn-confirm w-full py-2.5 rounded-xl text-sm font-semibold text-white"
+          style="background: #3a6b45"
+        >
+          Nueva venta
+        </button>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
